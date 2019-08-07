@@ -1,0 +1,52 @@
+[package]
+name = "grinwallet_nodejs"
+version = "0.1.0"
+authors = ["Gary Yu <gairy.yu@gmail.com>"]
+description = "Grin Wallet Node.js Libs. With embedded Grin Relay service."
+license = "Apache-2.0"
+build = "build.rs"
+exclude = ["artifacts.json", "index.node"]
+publish = false
+edition = "2018"
+
+[lib]
+name = "grinwallet_nodejs"
+crate-type = ["dylib"]
+
+[dependencies]
+neon = "0.2.0"
+clap = { version = "2.31", features = ["yaml"] }
+ctrlc = { version = "3.1", features = ["termination"] }
+failure = "0.1"
+failure_derive = "0.1"
+linefeed = "0.6"
+log = "0.4"
+prettytable-rs = "0.7"
+rpassword = "2.0.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_derive = "1"
+serde_json = "1"
+uuid = "0.7.4"
+
+# Normal using
+grin_wallet = { git = "https://github.com/gottstech/grin-wallet", tag = "v2.0.1-alpha.2" }
+grin_wallet_api = { git = "https://github.com/gottstech/grin-wallet", tag = "v2.0.1-alpha.2" }
+grin_wallet_config = { git = "https://github.com/gottstech/grin-wallet", tag = "v2.0.1-alpha.2" }
+grin_wallet_controller = { git = "https://github.com/gottstech/grin-wallet", tag = "v2.0.1-alpha.2" }
+grin_wallet_impls = { git = "https://github.com/gottstech/grin-wallet", tag = "v2.0.1-alpha.2" }
+grin_wallet_libwallet = { git = "https://github.com/gottstech/grin-wallet", tag = "v2.0.1-alpha.2" }
+grin_wallet_util = { git = "https://github.com/gottstech/grin-wallet", tag = "v2.0.1-alpha.2" }
+grin_wallet_relay = { git = "https://github.com/gottstech/grin-wallet", tag = "v2.0.1-alpha.2" }
+
+# In case of local development
+#grin_wallet_api = { path = "../../grin-wallet/api" }
+#grin_wallet_config = { path = "../../grin-wallet/config" }
+#grin_wallet_controller = { path = "../../grin-wallet/controller" }
+#grin_wallet_impls = { path = "../../grin-wallet/impls" }
+#grin_wallet_libwallet = { path = "../../grin-wallet/libwallet" }
+#grin_wallet_util = { path = "../../grin-wallet/util" }
+#grin_wallet_relay = { path = "../../grin-wallet/grinrelay" }
+
+[build-dependencies]
+neon-build = "0.2.0"
+built = "0.3"

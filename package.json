@@ -1,0 +1,18 @@
+{
+  "name": "grinwallet-nodejs",
+  "version": "0.1.0",
+  "description": "grin wallet node.js api",
+  "main": "lib/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gottstech/grinwallet-nodejs"
+  },
+  "author": "Gary Yu <gairy.yu@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "neon-cli": "^0.2.0"
+  },
+  "scripts": {
+    "install": "neon build"
+  }
+}
