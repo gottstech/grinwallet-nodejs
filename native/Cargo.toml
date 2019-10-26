@@ -14,7 +14,7 @@ name = "grinwallet_nodejs"
 crate-type = ["dylib"]
 
 [dependencies]
-neon = "0.2.0"
+neon = "0.3.3"
 clap = { version = "2.31", features = ["yaml"] }
 ctrlc = { version = "3.1", features = ["termination"] }
 failure = "0.1"
@@ -48,5 +48,5 @@ grin_wallet_relay = { git = "https://github.com/gottstech/grin-wallet", tag = "v
 #grin_wallet_relay = { path = "../../grin-wallet/grinrelay" }
 
 [build-dependencies]
-neon-build = "0.2.0"
+neon-build = "0.3.3"
 built = "0.3"
