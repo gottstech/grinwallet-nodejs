@@ -27,13 +27,13 @@ use uuid::Uuid;
 
 use grin_wallet_api::{Foreign, Owner};
 use grin_wallet_config::{GrinRelayConfig, WalletConfig};
-use grin_wallet_controller::{grinrelay_address, grinrelay_listener};
+use grin_wallet_controller::{grinrelay_address, grinrelay_listener, controller::foreign_listener};
 use grin_wallet_impls::{
     instantiate_wallet, Error, ErrorKind, FileWalletCommAdapter, GrinrelayWalletCommAdapter,
     HTTPNodeClient, HTTPWalletCommAdapter, LMDBBackend, WalletSeed,
 };
 use grin_wallet_libwallet::api_impl::types::InitTxArgs;
-use grin_wallet_libwallet::{NodeClient, SlateVersion, VersionedSlate, WalletInst};
+use grin_wallet_libwallet::{NodeClient, WalletInst};
 use grin_wallet_util::grin_core::global::ChainTypes;
 use grin_wallet_util::grin_keychain::ExtKeychain;
 use grin_wallet_util::grin_util::{Mutex, ZeroingString};
@@ -97,7 +97,7 @@ fn new_wallet_config(config: MobileWalletCfg) -> Result<WalletConfig, Error> {
 
     Ok(WalletConfig {
         chain_type: Some(chain_type),
-        api_listen_interface: "127.0.0.1".to_string(),
+        api_listen_interface: "0.0.0.0".to_string(),
         api_listen_port: 3415,
         owner_api_listen_port: Some(3420),
         api_secret_path: Some(".api_secret".to_string()),
@@ -476,50 +476,16 @@ fn listen(json_cfg: &str) -> Result<String, Error> {
         None,
     )?;
 
-    let _handle = thread::spawn(move || {
-        let api = Foreign::new(wallet, None);
-        loop {
-            match relay_rx.try_recv() {
-                Ok((addr, slate)) => {
-                    let _slate_id = slate.id;
-                    if api.verify_slate_messages(&slate).is_ok() {
-                        let slate_rx = api.receive_tx(
-                            &slate,
-                            Some(&config.account),
-                            None,
-                            Some(grinrelay_key_path),
-                        );
-                        if let Ok(slate_rx) = slate_rx {
-                            let versioned_slate =
-                                VersionedSlate::into_version(slate_rx.clone(), SlateVersion::V2);
-                            let res =
-                                grinrelay_listener.publish(&versioned_slate, &addr.to_owned());
-                            match res {
-                                Ok(_) => {
-                                    //info!(
-                                    //    "Slate [{}] sent back to {} successfully",
-                                    //    slate_id.to_string().bright_green(),
-                                    //    addr.bright_green(),
-                                    //);
-                                }
-                                Err(_e) => {
-                                    //error!(
-                                    //    "Slate [{}] fail to sent back to {} for {}",
-                                    //    slate_id.to_string().bright_green(),
-                                    //    addr.bright_green(),
-                                    //    e,
-                                    //);
-                                }
-                            }
-                        }
-                    }
-                }
-                Err(TryRecvError::Disconnected) => break,
-                Err(TryRecvError::Empty) => {}
-            }
-            thread::sleep(Duration::from_millis(100));
-        }
-    });
+    let wallet_config = new_wallet_config(config.clone())?;
+    foreign_listener(
+        wallet.clone(),
+        &wallet_config.api_listen_addr(),
+        None,
+        Some(relay_rx),
+        Some(grinrelay_listener),
+        Some(grinrelay_key_path),
+        &config.account,
+    )?;
 
     //if handle.is_err() {
     //    Err(ErrorKind::GenericError("Listen thread fail to start".to_string()).into())?
