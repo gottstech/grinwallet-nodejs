@@ -11,7 +11,7 @@ edition = "2018"
 
 [lib]
 name = "grinwallet_nodejs"
-crate-type = ["dylib"]
+crate-type = ["cdylib"]
 
 [dependencies]
 neon = "0.3.3"
