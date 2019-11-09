@@ -29,9 +29,10 @@ brew install openssl
 ## Build steps
 
 ```sh
-git clone https://github.com/gottstech/grinwallet-nodejs.git
-cd grinwallet-nodejs
-neon build --release
+    git clone https://github.com/gottstech/grinwallet-nodejs.git
+    cd grinwallet-nodejs
+    neon build --release
+or  npm install
 ```
 
 ## Document
