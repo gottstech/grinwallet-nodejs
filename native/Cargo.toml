@@ -20,6 +20,7 @@ ctrlc = { version = "3.1", features = ["termination"] }
 failure = "0.1"
 failure_derive = "0.1"
 linefeed = "0.6"
+log4rs = { version = "0.8.1", features = ["rolling_file_appender", "compound_policy", "size_trigger", "fixed_window_roller"] }
 log = "0.4"
 prettytable-rs = "0.7"
 regex = "1"
@@ -30,14 +31,24 @@ serde_json = "1"
 uuid = "0.7.4"
 
 # Normal using
-grin_wallet = { git = "https://github.com/gottstech/grin-wallet", tag = "v2.0.1-beta.4" }
-grin_wallet_api = { git = "https://github.com/gottstech/grin-wallet", tag = "v2.0.1-beta.4" }
-grin_wallet_config = { git = "https://github.com/gottstech/grin-wallet", tag = "v2.0.1-beta.4" }
-grin_wallet_controller = { git = "https://github.com/gottstech/grin-wallet", tag = "v2.0.1-beta.4" }
-grin_wallet_impls = { git = "https://github.com/gottstech/grin-wallet", tag = "v2.0.1-beta.4" }
-grin_wallet_libwallet = { git = "https://github.com/gottstech/grin-wallet", tag = "v2.0.1-beta.4" }
-grin_wallet_util = { git = "https://github.com/gottstech/grin-wallet", tag = "v2.0.1-beta.4" }
-grin_wallet_relay = { git = "https://github.com/gottstech/grin-wallet", tag = "v2.0.1-beta.4" }
+#grin_wallet = { git = "https://github.com/gottstech/grin-wallet", tag = "v2.0.1-beta.4" }
+#grin_wallet_api = { git = "https://github.com/gottstech/grin-wallet", tag = "v2.0.1-beta.4" }
+#grin_wallet_config = { git = "https://github.com/gottstech/grin-wallet", tag = "v2.0.1-beta.4" }
+#grin_wallet_controller = { git = "https://github.com/gottstech/grin-wallet", tag = "v2.0.1-beta.4" }
+#grin_wallet_impls = { git = "https://github.com/gottstech/grin-wallet", tag = "v2.0.1-beta.4" }
+#grin_wallet_libwallet = { git = "https://github.com/gottstech/grin-wallet", tag = "v2.0.1-beta.4" }
+#grin_wallet_util = { git = "https://github.com/gottstech/grin-wallet", tag = "v2.0.1-beta.4" }
+#grin_wallet_relay = { git = "https://github.com/gottstech/grin-wallet", tag = "v2.0.1-beta.4" }
+
+# Bleeding edge
+grin_wallet = { git = "https://github.com/gottstech/grin-wallet", rev = "538d836" }
+grin_wallet_api = { git = "https://github.com/gottstech/grin-wallet", rev = "538d836" }
+grin_wallet_config = { git = "https://github.com/gottstech/grin-wallet", rev = "538d836" }
+grin_wallet_controller = { git = "https://github.com/gottstech/grin-wallet", rev = "538d836" }
+grin_wallet_impls = { git = "https://github.com/gottstech/grin-wallet", rev = "538d836" }
+grin_wallet_libwallet = { git = "https://github.com/gottstech/grin-wallet", rev = "538d836" }
+grin_wallet_util = { git = "https://github.com/gottstech/grin-wallet", rev = "538d836" }
+grin_wallet_relay = { git = "https://github.com/gottstech/grin-wallet", rev = "538d836" }
 
 # In case of local development
 #grin_wallet_api = { path = "../../grin-wallet/api" }

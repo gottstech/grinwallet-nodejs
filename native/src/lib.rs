@@ -26,7 +26,7 @@ use serde_json::json;
 use uuid::Uuid;
 
 use grin_wallet_api::{Foreign, Owner};
-use grin_wallet_config::{GrinRelayConfig, WalletConfig};
+use grin_wallet_config::{GrinRelayConfig, WalletConfig, config::get_grin_path};
 use grin_wallet_controller::{grinrelay_address, grinrelay_listener, controller::foreign_listener};
 use grin_wallet_impls::{
     instantiate_wallet, Error, ErrorKind, FileWalletCommAdapter, GrinrelayWalletCommAdapter,
@@ -37,6 +37,7 @@ use grin_wallet_libwallet::{NodeClient, WalletInst};
 use grin_wallet_util::grin_core::global::ChainTypes;
 use grin_wallet_util::grin_keychain::ExtKeychain;
 use grin_wallet_util::grin_util::{Mutex, ZeroingString};
+use grin_wallet_util::{init_logger, LoggingConfig, LogLevel};
 use neon::types::JsString;
 
 /// Default minimum confirmation
@@ -75,6 +76,7 @@ struct MobileWalletCfg {
     password: String,
     minimum_confirmations: u64,
     grinrelay_config: Option<GrinRelayConfig>,
+    file_log_level: Option<LogLevel>,
 }
 
 impl MobileWalletCfg {
@@ -462,6 +464,32 @@ pub fn grin_init_tx(mut cx: FunctionContext) -> JsResult<JsString> {
 
 fn listen(json_cfg: &str) -> Result<String, Error> {
     let config = MobileWalletCfg::from_str(json_cfg)?;
+    let chain_type = match config.chain_type.as_str() {
+        "mainnet" => ChainTypes::Mainnet,
+        "floonet" => ChainTypes::Floonet,
+        _ => {
+            return Err(Error::from(ErrorKind::GenericError(
+                "unsupported chain type".to_owned(),
+            )));
+        }
+    };
+    let grin_path = get_grin_path(&chain_type).unwrap();
+    let mut log_file_path = grin_path.clone();
+    log_file_path.push("grin-wallet.chuckle.log");
+
+    let l = LoggingConfig {
+        log_to_stdout: true,
+        stdout_log_level: LogLevel::Error,
+        log_to_file: true,
+        file_log_level: config.file_log_level.clone().unwrap_or(LogLevel::Debug),
+        log_file_path: log_file_path.to_str().unwrap().to_string(),
+        log_file_append: true,
+        log_max_size: Some(1024 * 1024 * 16), // 16 megabytes default
+        log_max_files: Some(3),
+        tui_running: None,
+    };
+    init_logger(Some(l));
+
     let wallet = get_wallet_instance(config.clone())?;
 
     // The streaming channel between 'grinrelay_listener' and 'foreign_listener'
@@ -477,19 +505,17 @@ fn listen(json_cfg: &str) -> Result<String, Error> {
     )?;
 
     let wallet_config = new_wallet_config(config.clone())?;
-    foreign_listener(
-        wallet.clone(),
-        &wallet_config.api_listen_addr(),
-        None,
-        Some(relay_rx),
-        Some(grinrelay_listener),
-        Some(grinrelay_key_path),
-        &config.account,
-    )?;
-
-    //if handle.is_err() {
-    //    Err(ErrorKind::GenericError("Listen thread fail to start".to_string()).into())?
-    //}
+    let _handle = thread::spawn(move || {
+        foreign_listener(
+            wallet.clone(),
+            &wallet_config.api_listen_addr(),
+            None,
+            Some(relay_rx),
+            Some(grinrelay_listener),
+            Some(grinrelay_key_path),
+            &config.account,
+        ).expect("could not start http listener!");;
+    });
     Ok("OK".to_owned())
 }
 
